@@ -1,7 +1,10 @@
+import pygame.image
 from pygame import *
 import socket
 import json
 from threading import Thread
+from pygame import mixer
+mixer.init()
 
 # ---ПУГАМЕ НАЛАШТУВАННЯ ---
 WIDTH, HEIGHT = 800, 600
@@ -41,8 +44,13 @@ def receive():
 font_win = font.Font(None, 72)
 font_main = font.Font(None, 36)
 # --- ЗОБРАЖЕННЯ ----
-
+background = pygame.image.load("R.jpg")
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 # --- ЗВУКИ ---
+
+
+
+
 
 # --- ГРА ---
 game_over = False
@@ -50,6 +58,11 @@ winner = None
 you_winner = None
 my_id, game_state, buffer, client = connect_to_server()
 Thread(target=receive, daemon=True).start()
+mixer.init()
+if my_id == 0:
+    mixer.music.load("game_music.mp3")
+    mixer.music.play(-1)
+    mixer.music.set_volume(0.5)
 while True:
     for e in event.get():
         if e.type == QUIT:
@@ -87,21 +100,14 @@ while True:
         display.update()
         continue  # Блокує гру після перемоги
 
+
     if game_state:
-        screen.fill((30, 30, 30))
+        screen.blit(background, (0, 0))
         draw.rect(screen, (0, 255, 0), (20, game_state['paddles']['0'], 20, 100))
         draw.rect(screen, (255, 0, 255), (WIDTH - 40, game_state['paddles']['1'], 20, 100))
         draw.circle(screen, (255, 255, 255), (game_state['ball']['x'], game_state['ball']['y']), 10)
         score_text = font_main.render(f"{game_state['scores'][0]} : {game_state['scores'][1]}", True, (255, 255, 255))
         screen.blit(score_text, (WIDTH // 2 -25, 20))
-
-        if game_state['sound_event']:
-            if game_state['sound_event'] == 'wall_hit':
-                # звук відбиття м'ячика від стін
-                pass
-            if game_state['sound_event'] == 'platform_hit':
-                # звук відбиття м'ячика від платформи
-                pass
 
     else:
         wating_text = font_main.render(f"Очікування гравців...", True, (255, 255, 255))
@@ -115,3 +121,4 @@ while True:
         client.send(b"UP")
     elif keys[K_s]:
         client.send(b"DOWN")
+
