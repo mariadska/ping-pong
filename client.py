@@ -47,7 +47,11 @@ font_main = font.Font(None, 36)
 background = pygame.image.load("R.jpg")
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 ball_img = pygame.image.load("ball.png")
-ball_img = pygame.transform.scale(ball_img, (20, 20))
+ball_img = pygame.transform.scale(ball_img, (40, 40))
+paddle1_img = pygame.image.load("11.png")
+paddle1_img = pygame.transform.scale(paddle1_img, (20,100))
+paddle2_img = pygame.image.load("22.png")
+paddle2_img = pygame.transform.scale(paddle2_img, (20,100))
 # --- ЗВУКИ ---
 
 
@@ -102,8 +106,8 @@ while True:
 
     if game_state:
         screen.blit(background, (0, 0))
-        draw.rect(screen, (0, 255, 0), (20, game_state['paddles']['0'], 20, 100))
-        draw.rect(screen, (255, 0, 255), (WIDTH - 40, game_state['paddles']['1'], 20, 100))
+        screen.blit(paddle1_img, (20, game_state['paddles']['0']))
+        screen.blit(paddle2_img, (WIDTH - 40, game_state['paddles']['1']))
         screen.blit(ball_img, (game_state['ball']['x'] - 10, game_state['ball']['y'] - 10))
         score_text = font_main.render(f"{game_state['scores'][0]} : {game_state['scores'][1]}", True, (255, 255, 255))
         screen.blit(score_text, (WIDTH // 2 -25, 20))
