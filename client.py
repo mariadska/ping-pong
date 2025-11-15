@@ -44,7 +44,7 @@ def receive():
 font_win = font.Font(None, 72)
 font_main = font.Font(None, 36)
 # --- ЗОБРАЖЕННЯ ----
-background = pygame.image.load("R.jpg")
+background = pygame.image.load("R.png.png")
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 ball_img = pygame.image.load("ball.png")
 ball_img = pygame.transform.scale(ball_img, (40, 40))
@@ -52,6 +52,13 @@ paddle1_img = pygame.image.load("11.png")
 paddle1_img = pygame.transform.scale(paddle1_img, (20,100))
 paddle2_img = pygame.image.load("22.png")
 paddle2_img = pygame.transform.scale(paddle2_img, (20,100))
+background_wait = pygame.image.load("waiting_bg.png")
+background_wait = pygame.transform.scale(background_wait, (WIDTH, HEIGHT))
+win_bg = pygame.image.load("win_bg.png")
+lose_bg = pygame.image.load("lose_bg.png")
+win_bg = pygame.transform.scale(win_bg, (WIDTH, HEIGHT))
+lose_bg = pygame.transform.scale(lose_bg, (WIDTH, HEIGHT))
+
 # --- ЗВУКИ ---
 
 
@@ -66,6 +73,7 @@ if my_id == 0:
     mixer.music.load("game_music.mp3")
     mixer.music.play(-1)
     mixer.music.set_volume(0.5)
+    sound_lose = mixer.Sound("lose.mp3")
 while True:
     for e in event.get():
         if e.type == QUIT:
@@ -86,18 +94,20 @@ while True:
                 you_winner = True
             else:
                 you_winner = False
+                sound_lose.play()
 
-        if you_winner:
-            text = "Ти переміг!"
-        else:
-            text = "Пощастить наступним разом!"
+        if "winner" in game_state and game_state["winner"] is not None:
 
-        win_text = font_win.render(text, True, (255, 215, 0))
-        text_rect = win_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        screen.blit(win_text, text_rect)
+            if you_winner is None:  # хто виграв — визначаємо один раз
+                you_winner = (game_state["winner"] == my_id)
 
-        text = font_win.render('К - рестарт', True, (255, 215, 0))
-        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 120))
+            if you_winner:
+                screen.blit(win_bg, (0, 0))
+            else:
+                screen.blit(lose_bg, (0, 0))
+
+        text = font_win.render("K - рестарт", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 150))
         screen.blit(text, text_rect)
 
         display.update()
@@ -109,12 +119,11 @@ while True:
         screen.blit(paddle1_img, (20, game_state['paddles']['0']))
         screen.blit(paddle2_img, (WIDTH - 40, game_state['paddles']['1']))
         screen.blit(ball_img, (game_state['ball']['x'] - 10, game_state['ball']['y'] - 10))
-        score_text = font_main.render(f"{game_state['scores'][0]} : {game_state['scores'][1]}", True, (255, 255, 255))
+        score_text = font_main.render(f"{game_state['scores'][0]} : {game_state['scores'][1]}", True, (0, 180, 255))
         screen.blit(score_text, (WIDTH // 2 -25, 20))
 
     else:
-        wating_text = font_main.render(f"Очікування гравців...", True, (255, 255, 255))
-        screen.blit(wating_text, (WIDTH // 2 - 25, 20))
+        screen.blit(background_wait, (0, 0))
 
     display.update()
     clock.tick(60)
